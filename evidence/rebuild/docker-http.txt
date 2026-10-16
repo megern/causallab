@@ -1,0 +1,25 @@
+{
+  "synthetic": true,
+  "http_status": 200,
+  "invalid_input_status": 422,
+  "latency_ms": [
+    11.432041181251407,
+    2.8409159276634455,
+    2.8205420821905136
+  ],
+  "result": {
+    "treatment_effect": 3.0000000000000004,
+    "robust_standard_error": 0.024352967914190008,
+    "approximate_95_percent_interval": [
+      2.952268182888188,
+      3.047731817111813
+    ],
+    "propensity_range": [
+      0.5,
+      0.5
+    ],
+    "poor_overlap_fraction": 0.0,
+    "warnings": [],
+    "assumptions": "Causal interpretation requires no unmeasured confounding, positivity, consistency, and a correct linear additive outcome model. Interval uses HC1 robust variance and a normal approximation; small samples are exploratory."
+  }
+}
