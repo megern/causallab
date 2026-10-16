@@ -1,0 +1,6 @@
+ Container venture-lab-causallab-1  Recreate
+ Container venture-lab-causallab-1  Recreated
+ Container venture-lab-causallab-1  Starting
+ Container venture-lab-causallab-1  Started
+ Container venture-lab-causallab-1  Waiting
+ Container venture-lab-causallab-1  Healthy

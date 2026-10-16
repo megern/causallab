@@ -1,0 +1,50 @@
+{
+  "application": "causallab",
+  "version": "0.2.0",
+  "recorded_at_utc": "2026-10-14T22:05:45.334936+00:00",
+  "evidence_scope": "Application developer rebuild checks, not independent QA or human validation",
+  "checks": [
+    {
+      "check": "pytest",
+      "exit_code": 0,
+      "evidence": "evidence/rebuild/pytest.txt"
+    },
+    {
+      "check": "frontend",
+      "exit_code": 0,
+      "evidence": "evidence/rebuild/frontend.txt"
+    },
+    {
+      "check": "javascript-syntax",
+      "exit_code": 0,
+      "evidence": "evidence/rebuild/javascript-syntax.txt"
+    },
+    {
+      "check": "bandit",
+      "exit_code": 0,
+      "evidence": "evidence/rebuild/bandit.txt"
+    }
+  ],
+  "application_sha256": {
+    "app/USER_GUIDE.md": "e4ed84b15d3bf73c3aeca959c5e75641744813e00658310f3eddd54f4eb9e875",
+    "app/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "app/guard.py": "0537a96952380ee89e8d6088f0c798b210ab642add3520ee656136d9504584f8",
+    "app/main.py": "8b56a62e2cea6cd8a26eba93c95ed0b3642229cd82dac0281ad13a82bb3be2be",
+    "app/static/index.html": "d941cd353df1c0fc3bcbac514932028fd7c4a5185538999f9d366fa226fad44b",
+    "app/static/config.js": "e789a3cfa43af89eb65d664506a6ea251ad3a258c5a8440c25326b34b8b40682",
+    "app/static/data.js": "c12a15bcb1b73fafcf4a5484562b0ccdf657fc53933596222b79c8fdf9dd53c0",
+    "app/static/style.css": "2f18278b89e88530bfd63e93255cf54725bf3c54ea633429ba4bcb909ee4220f",
+    "app/static/causal-chart.js": "a3df39a6c7d576c691c7004c2e008983b383368785f1d854dd9de6fe81aef6ae",
+    "app/static/workbench.js": "0a9050375b52d6437f4e83913ea49aa3968aaf9a3b9163a758c68d7c5c4b6b50"
+  },
+  "not_verified_by_this_record": [
+    "Docker runtime",
+    "interactive browser UI",
+    "remote GitHub CI",
+    "dependency audit",
+    "release publication"
+  ],
+  "data_provenance": "Bundled examples and test fixtures are synthetic; user imports unverified.",
+  "causal_interval_followup": "Actual point/interval/zero-reference chart; 16 Python tests and 14 frontend checks pass, including mocked-canvas geometry and drawing. Browser visual verification is assigned to root.",
+  "csv_integrity_followup": "Explicit quoted-empty/whitespace-only/delimiter-empty records preserved; only physically empty lines skipped. Missing numeric observations produce actionable errors. All Python+Node checks rerun and passed."
+}
