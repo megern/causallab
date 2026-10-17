@@ -267,6 +267,28 @@ function render(result, input) {
       result.approximate_95_percent_interval,
       format,
     );
+    $("group-counts").textContent =
+      `Raw groups: ${result.group_counts.control} control and ${result.group_counts.treated} treated observations.`;
+    table(
+      $("balance-table"),
+      [
+        "Confounder",
+        "Control mean",
+        "Treated mean",
+        "Pooled sample SD",
+        "Treated − control SMD",
+        "Descriptive |SMD| ≥ 0.1",
+      ],
+      result.covariate_balance.map((row) => [
+        row.confounder,
+        format(row.control_mean),
+        format(row.treated_mean),
+        format(row.pooled_sample_sd),
+        format(row.standardized_mean_difference),
+        row.descriptive_imbalance_flag ? "Inspect" : "Below heuristic",
+      ]),
+    );
+    $("balance-note").textContent = result.balance_method;
     headers = ["Diagnostic", "Value"];
     rows = [
       [
@@ -442,7 +464,7 @@ $("export-result").onclick = () => {
   if (lastResult)
     download(cfg.slug + "-report.json", {
       application: cfg.title,
-      version: "0.2.0",
+      version: "0.3.0",
       data_source: $("source-label").textContent,
       created_at: new Date().toISOString(),
       configuration: analysisSnapshot,

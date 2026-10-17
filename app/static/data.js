@@ -109,6 +109,7 @@
           "Include at least three observations in each treatment group.",
         );
       out.confounders = matrix(data, map.confounders);
+      out.confounder_names = map.confounders;
       if (out.outcome.length < 10)
         throw Error("Effect estimation needs at least ten observations.");
       if (

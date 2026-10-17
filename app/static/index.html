@@ -12,7 +12,7 @@
   </head>
   <body>
     <header>
-      <span class="badge">Local CPU research · v0.2.0</span>
+      <span class="badge">Local CPU research · v0.3.0</span>
       <h1>CausalLab</h1>
       <p>
         Estimate a treatment coefficient while adjusting for measured
@@ -53,6 +53,10 @@
         <canvas id="chart" role="img"></canvas>
         <div class="scroll" id="result-table"></div>
         <p id="table-note" class="hint"></p>
+        <h3>Raw covariate balance</h3>
+        <p id="group-counts"></p>
+        <div class="scroll" id="balance-table"></div>
+        <p id="balance-note" class="hint"></p>
         <h3>Assumptions and limits</h3>
         <p id="assumptions" class="hint"></p>
         <button id="export-result" disabled>Export result report (JSON)</button
