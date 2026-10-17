@@ -214,3 +214,22 @@ test("canvas actually draws one point, a horizontal interval and dashed zero ref
 console.log(
   `${checks} total frontend checks passed after causal chart validation`,
 );
+
+test("selected confounder labels preserved in replay payload", () => {
+  const data = parseCSV(
+    "outcome,treatment,Baseline\n" +
+      Array.from({ length: 12 }, (_, i) => `${i + 2},${i % 2},${i % 5}`).join(
+        "\n",
+      ),
+  );
+  const request = payload(
+    "causallab",
+    data,
+    { outcome: "outcome", treatment: "treatment", confounders: ["Baseline"] },
+    {},
+  );
+  assert.deepEqual(request.confounder_names, ["Baseline"]);
+  assert.equal(request.confounders[7][0], 2);
+});
+
+console.log(`${checks} final frontend checks passed for ${cfg.title} v0.3.0`);

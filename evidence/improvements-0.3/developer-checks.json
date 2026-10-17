@@ -1,0 +1,49 @@
+{
+  "application": "causallab",
+  "version": "0.3.0",
+  "recorded_at_utc": "2026-10-16T22:00:09.571419+00:00",
+  "role": "Application developer checks; not an independent or human audit",
+  "checks": [
+    {
+      "label": "pytest",
+      "exit_code": 0,
+      "evidence": "evidence/improvements-0.3/pytest.txt"
+    },
+    {
+      "label": "frontend",
+      "exit_code": 0,
+      "evidence": "evidence/improvements-0.3/frontend.txt"
+    },
+    {
+      "label": "ruff",
+      "exit_code": 0,
+      "evidence": "evidence/improvements-0.3/ruff.txt"
+    },
+    {
+      "label": "bandit",
+      "exit_code": 0,
+      "evidence": "evidence/improvements-0.3/bandit.txt"
+    }
+  ],
+  "javascript_syntax": "all selfhosted .js files checked with node --check, exit0",
+  "application_sha256": {
+    "app/USER_GUIDE.md": "ca7f29c405b04ab0548570ccaabe699998e854d53d9d11a15d65c56718b32b5e",
+    "app/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "app/guard.py": "d1eda2150e58503114c6cf4ba36d5958aa7e2cfbb496fc0d8026b5c9da4beb77",
+    "app/main.py": "e6d5a9f0aba586fdf3091edec76a14f563f69d930d8d2741fd77135b8067cacb",
+    "app/static/index.html": "4cd62393bcdb15d4796f733a80ff3de18ee0357521991456afc220e0d5339b59",
+    "app/static/config.js": "53ad8f41584daf63d88dfac100b4dcbf536f67a026a6e04bfd0c40c98ef4418a",
+    "app/static/data.js": "cfef79ad585fbd2c2053f6a07e3079b158ccd506b76115a478920f6e106ce70b",
+    "app/static/style.css": "2f18278b89e88530bfd63e93255cf54725bf3c54ea633429ba4bcb909ee4220f",
+    "app/static/causal-chart.js": "a3df39a6c7d576c691c7004c2e008983b383368785f1d854dd9de6fe81aef6ae",
+    "app/static/workbench.js": "f2187d1c7f1f72862a6db25e28fc24a9bed88f140f5607f3542fef41a46a36f2"
+  },
+  "external_gates_not_claimed": [
+    "Docker build/runtime",
+    "interactive browser verification",
+    "dependency/secret audit",
+    "remote CI",
+    "release publication"
+  ],
+  "synthetic_data": true
+}

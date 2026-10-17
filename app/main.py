@@ -1,4 +1,5 @@
 import math
+from .guard import InputGuard
 import numpy as np
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -28,6 +29,8 @@ class Request(BaseModel):
     treatment: list[int] = Field(min_length=10, max_length=100000)
     confounders: list[list[float]] = Field(min_length=10, max_length=100000)
 
+    confounder_names: list[str] | None = Field(default=None, max_length=50)
+
     @model_validator(mode="after")
     def valid(self):
         matrix(self.confounders)
@@ -43,7 +46,54 @@ class Request(BaseModel):
             raise ValueError(
                 "binary treatment needs at least three observations in each group"
             )
+        if self.confounder_names is not None and (
+            len(self.confounder_names) != len(self.confounders[0])
+            or any(
+                not name.strip() or len(name) > 100 for name in self.confounder_names
+            )
+            or len(set(name.strip() for name in self.confounder_names))
+            != len(self.confounder_names)
+        ):
+            raise ValueError(
+                "confounder_names must be nonempty, unique after trimming, at most 100 characters, and match column count"
+            )
         return self
+
+
+def covariate_balance(confounders, treatment, names):
+    """Descriptive, unweighted raw-group balance; no adjustment or causal test."""
+    control, treated = confounders[treatment == 0], confounders[treatment == 1]
+    n0, n1 = len(control), len(treated)
+    diagnostics = []
+    for index, name in enumerate(names):
+        mean0, mean1 = float(control[:, index].mean()), float(treated[:, index].mean())
+        variance0, variance1 = float(control[:, index].var(ddof=1)), float(
+            treated[:, index].var(ddof=1)
+        )
+        pooled_sd = math.sqrt(
+            ((n0 - 1) * variance0 + (n1 - 1) * variance1) / (n0 + n1 - 2)
+        )
+        difference = mean1 - mean0
+        smd = (
+            difference / pooled_sd
+            if pooled_sd > 0
+            else (0.0 if difference == 0 else None)
+        )
+        diagnostics.append(
+            {
+                "confounder": name,
+                "control_mean": mean0,
+                "treated_mean": mean1,
+                "pooled_sample_sd": pooled_sd,
+                "standardized_mean_difference": smd,
+                "absolute_smd": abs(smd) if smd is not None else None,
+                "descriptive_imbalance_flag": (
+                    abs(smd) >= 0.1 if smd is not None else True
+                ),
+                "zero_pooled_variance": pooled_sd == 0,
+            }
+        )
+    return diagnostics
 
 
 def analyze(req: Request):
@@ -80,7 +130,18 @@ def analyze(req: Request):
             break
     p = 1 / (1 + np.exp(-np.clip(z @ beta, -30, 30)))
     fraction = float(np.mean((p < 0.05) | (p > 0.95)))
+    names = (
+        [name.strip() for name in req.confounder_names]
+        if req.confounder_names is not None
+        else [f"confounder_{i}" for i in range(c.shape[1])]
+    )
     return {
+        "group_counts": {
+            "control": int(np.sum(t == 0)),
+            "treated": int(np.sum(t == 1)),
+        },
+        "covariate_balance": covariate_balance(c, t, names),
+        "balance_method": "Raw, unweighted treated-minus-control mean divided by pooled sample SD: sqrt(((n0-1)*s0^2+(n1-1)*s1^2)/(n0+n1-2)). Absolute SMD >= 0.1 is a descriptive heuristic only; low SMD does not prove positivity, unconfoundedness, or causal identification. These are pre-adjustment groups, not a claim that OLS balanced covariates. Zero pooled SD with unequal means yields null SMD and a warning flag.",
         "treatment_effect": float(coefficients[1]),
         "robust_standard_error": se,
         "approximate_95_percent_interval": [
@@ -98,7 +159,7 @@ def analyze(req: Request):
     }
 
 
-app = FastAPI(title="CausalLab", version="0.2.0")
+app = FastAPI(title="CausalLab", version="0.3.0")
 
 
 STATIC = Path(__file__).parent / "static"
@@ -142,7 +203,5 @@ def run_analysis(req: Request):
     except (ValueError, np.linalg.LinAlgError, OverflowError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-
-from .guard import InputGuard
 
 app.add_middleware(InputGuard)

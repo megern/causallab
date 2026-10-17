@@ -1,4 +1,4 @@
-# CausalLab user guide — v0.2.0
+# CausalLab user guide — v0.3.0
 
 ## What this tool does
 
@@ -92,6 +92,14 @@ pip-audit --strict
 bandit -r app -ll
 ```
 
-Python tests exercise numerical results and actual HTTP endpoints. Node tests exercise CSV parsing, column mapping, numeric rejection and the synthetic analysis payload. Node22+ is used for development checks; it is not a runtime service dependency. Fresh rebuild evidence is under `evidence/rebuild/`; it records what was run and does not establish unexecuted Docker, GitHub CI or human validation. Configure required CI checks and never merge a failing release.
+Python tests exercise numerical results and actual HTTP endpoints. Node tests exercise CSV parsing, column mapping, numeric rejection and the synthetic analysis payload. Node22+ is used for development checks; it is not a runtime service dependency. Fresh v0.3.0 developer evidence is under `evidence/improvements-0.3/`; it records what was run and does not establish unexecuted Docker, GitHub CI or human validation. Configure required CI checks and never merge a failing release.
 
 MIT license; see LICENSE.
+
+## v0.3.0: descriptive covariate balance
+
+The UI now reports raw treated/control counts and a balance table for every selected confounder. CSV column labels are sent as optional `confounder_names`; API clients can omit names for backward-compatible `confounder_0`, etc. Supplied names must match matrix width, be nonempty and unique after trimming, and each contain at most100 characters.
+
+`covariate_balance` contains control/treated means, pooled sample SD, signed treated-minus-control SMD, absolute SMD, a descriptive flag, and a zero-variance indicator. For group sizes n0/n1 and **sample** variances s0²/s1², pooled SD = sqrt(((n0−1)s0²+(n1−1)s1²)/(n0+n1−2)). SMD = (treated mean−control mean)/pooled SD. Example: groups[1,2,3,4,5] and[2,3,4,5,6] have means3/4, pooled SDsqrt(2.5) and SMD≈0.63246.
+
+The |SMD|≥0.1 flag is a descriptive heuristic, not a test, p-value, causal criterion or evidence that an intervention should proceed. Diagnostics describe **raw unweighted groups before adjustment**; OLS does not make these groups balanced. A low SMD cannot prove no hidden confounding, positivity, or correct functional form. Zero pooled variance with unequal means yields null SMD and a flag; identical constant groups yield SMD0. The existing full-rank outcome-model requirement still rejects constant/collinear input designs. HC1 standard errors and normal-approximation intervals are unchanged. Exported reports include group counts and the full balance table.
