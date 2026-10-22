@@ -1,0 +1,67 @@
+{
+  "application": "causallab",
+  "version": "0.4.0",
+  "reviewer": "build_enterprise automated independent reviewer",
+  "checked_at_utc": "2026-10-22T17:55:40.451242+00:00",
+  "url": "http://127.0.0.1:18403",
+  "synthetic": true,
+  "checks": [
+    "Actual final container HTTP health is ok; current root inspection confirms native health healthy on exact matching image/container IDs",
+    "Current0.4 API version, root HTML, guide and every static file match reviewed source bytes",
+    "Actual optional Hajek IPW returns known ATE3, ESS5 per arm, no clipping and no uncertainty claim",
+    "Absent comparison treatment group rejects with actual HTTP422"
+  ],
+  "scope": "Actual HTTP feature/error checks and served-byte matching. Backend container matching relies on accepted root-generated runtime source proof, independently checked against every current local app file. Not a browser-rendering or publication claim.",
+  "backend_freshness": {
+    "status": "PASS",
+    "root_proof_path": "outputs/evidence/improvements-0.4/runtime-source.json",
+    "root_proof_sha256": "e5392418dda519a74650eb84e06dd5fca9114b5cfb7b5ed4a8f1b719ba91d3b8",
+    "container": "6d2317102f945582b5a45c2aeba34700a89e59f974495e9528ca6ff1ded71359",
+    "application_files_verified": 12,
+    "method": "Every current app file hash and complete file set equals accepted root proof of the running container.",
+    "runtime_config_evidence": "docker-runtime.json",
+    "runtime_config_sha256": "608259b9b313c7107ec7064ddba934d23060abceb6cf28b9a780c7af8f3450a4",
+    "image_id": "sha256:58015c002848a825f3ff711f255a67aabd01ba6dc1bc6bdc5358e463d248af6f",
+    "native_health_status": "healthy",
+    "native_health_scope": "Root runtime inspection reports healthy on this exact container/image; independent reviewer checks same current proof and actual HTTP health separately."
+  },
+  "served_assets_sha256": [
+    {
+      "sha256": "f7a4a09a26b83052edc956cf886195c0f4687b0661a166320f460f3e3ccad0d5",
+      "path": "/static/access.js"
+    },
+    {
+      "sha256": "a3df39a6c7d576c691c7004c2e008983b383368785f1d854dd9de6fe81aef6ae",
+      "path": "/static/causal-chart.js"
+    },
+    {
+      "sha256": "d879388b23dbf38a3d32e6382777956102b1cb7de1cd257d296fe78cebeda683",
+      "path": "/static/config.js"
+    },
+    {
+      "sha256": "cfef79ad585fbd2c2053f6a07e3079b158ccd506b76115a478920f6e106ce70b",
+      "path": "/static/data.js"
+    },
+    {
+      "sha256": "b8682f6379ef086ce97b0ef5deb77e5b74316fdad7f820c705e47cf7eb7ff98a",
+      "path": "/static/index.html"
+    },
+    {
+      "sha256": "2f18278b89e88530bfd63e93255cf54725bf3c54ea633429ba4bcb909ee4220f",
+      "path": "/static/style.css"
+    },
+    {
+      "sha256": "7e3e9b4829c706c2026f7a07f3815657da3d8a6e6d7911f953881babaf5617e8",
+      "path": "/static/workbench.js"
+    },
+    {
+      "sha256": "b8682f6379ef086ce97b0ef5deb77e5b74316fdad7f820c705e47cf7eb7ff98a",
+      "path": "/"
+    },
+    {
+      "sha256": "be2c0959adc389c3818f9274d216af4025efc9397bd536433ae90101bea1bac3",
+      "path": "/guide"
+    }
+  ],
+  "status": "PASS"
+}

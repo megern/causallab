@@ -1,0 +1,156 @@
+{
+  "status": "PASS",
+  "pytest": {
+    "passed": 49,
+    "failed": 0
+  },
+  "scope": [
+    "Independent scalar bisection of regularized logistic score on symmetric synthetic strata",
+    "Reconstructed clipped subject weights, H\u00e1jek arm means, ESS and weighted SMD using Python math/statistics rather than application implementation",
+    "Verified20/30 observations clipped and treatment-complement sign/ESS symmetry",
+    "Inspected exact input bounds, convergence rejection and no IPW confidence-interval claim",
+    "Actual IPW UI handler fixture preserves distinct ATE/ESS/clipping values and exports include_ipw setting; running served code exactly matches repaired source."
+  ],
+  "issues": [],
+  "resolved_issues": [
+    {
+      "severity": "P3",
+      "detail": "Earlier Method paragraph said no second effect while optional IPW adds H\u00e1jek effect.",
+      "resolution": "Original author clarified default overlap-only behavior and separate optional IPW use in served/app/docs guide."
+    },
+    {
+      "severity": "P2",
+      "detail": "Root browser found weighted-balance table renderer replaced the parent IPW ATE/ESS/clipping summary.",
+      "resolution": "Original author now renders weighted balance in a child container. Independently inspected and reran actual checkbox/run/export handler proof retaining ATE, both ESS, clipping and balance."
+    }
+  ],
+  "confidence": "High for inspected weighted arithmetic and tested logistic-score reconstruction. Causal assumptions and real-world suitability unverified.",
+  "limits": "Regularized in-sample propensity fit with clipping; no cross-fitting, doubly robust correction or uncertainty interval. Balance and ESS do not establish identification.",
+  "application": "causallab",
+  "version": "0.4.0",
+  "reviewer": "build_enterprise automated independent science/QA reviewer",
+  "independent_author": true,
+  "reviewer_production_changes": false,
+  "checked_at_utc": "2026-10-22T17:56:00.251027+00:00",
+  "hashes": [
+    {
+      "path": "README.md",
+      "sha256": "764f87031ad31db1d5be3c1e8104029c191f13a483e327af56d8bec879f6706e"
+    },
+    {
+      "path": "app/USER_GUIDE.md",
+      "sha256": "be2c0959adc389c3818f9274d216af4025efc9397bd536433ae90101bea1bac3"
+    },
+    {
+      "path": "app/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "app/access.py",
+      "sha256": "bc340ac2d8658f547b2a58012834d302482fea40a8773ba0363b4a1b2edf251c"
+    },
+    {
+      "path": "app/guard.py",
+      "sha256": "d1eda2150e58503114c6cf4ba36d5958aa7e2cfbb496fc0d8026b5c9da4beb77"
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "4d9a97d897fdc1e2552d6b09c3d3cf3c5fa543ed566fdddc3713caf33a3b4f81"
+    },
+    {
+      "path": "app/static/access.js",
+      "sha256": "f7a4a09a26b83052edc956cf886195c0f4687b0661a166320f460f3e3ccad0d5"
+    },
+    {
+      "path": "app/static/causal-chart.js",
+      "sha256": "a3df39a6c7d576c691c7004c2e008983b383368785f1d854dd9de6fe81aef6ae"
+    },
+    {
+      "path": "app/static/config.js",
+      "sha256": "d879388b23dbf38a3d32e6382777956102b1cb7de1cd257d296fe78cebeda683"
+    },
+    {
+      "path": "app/static/data.js",
+      "sha256": "cfef79ad585fbd2c2053f6a07e3079b158ccd506b76115a478920f6e106ce70b"
+    },
+    {
+      "path": "app/static/index.html",
+      "sha256": "b8682f6379ef086ce97b0ef5deb77e5b74316fdad7f820c705e47cf7eb7ff98a"
+    },
+    {
+      "path": "app/static/style.css",
+      "sha256": "2f18278b89e88530bfd63e93255cf54725bf3c54ea633429ba4bcb909ee4220f"
+    },
+    {
+      "path": "app/static/workbench.js",
+      "sha256": "7e3e9b4829c706c2026f7a07f3815657da3d8a6e6d7911f953881babaf5617e8"
+    },
+    {
+      "path": "docs/USER_GUIDE.md",
+      "sha256": "be2c0959adc389c3818f9274d216af4025efc9397bd536433ae90101bea1bac3"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "2283c31aafa87882d478bb1e19fff3124d0dd863ada3d8d8daa0c1e96e609980"
+    },
+    {
+      "path": "tests/test_independent04_enterprise.py",
+      "sha256": "33db2985ac1bfafb049362fe84ae8143cea53c2ed7fdefc9beda04f1231db649"
+    },
+    {
+      "path": "tools/test_access.mjs",
+      "sha256": "26a68d9b7b2b26c741e9f00ede37131c7f25eef474b988bdb8e6b1218d2021d9"
+    },
+    {
+      "path": "tools/test_access_independent.mjs",
+      "sha256": "a011463941834d70d767df7204201aff25a59172bd6955be548cd34c7ae93307"
+    },
+    {
+      "path": "tools/test_ipw_ui.mjs",
+      "sha256": "1cb399992653b3634f7cd377c8b3560bd0c525f1dc796bfc6d7990cc4d87e5d5"
+    },
+    {
+      "path": "tools/test_ui.mjs",
+      "sha256": "0f8a3ca6ad04b5105ed49aef58d80d9b6afa57f246ba5408f7a515ae446efd06"
+    },
+    {
+      "path": "tools/ui-test-dom.mjs",
+      "sha256": "dc5f826098d93c1fda711ba5a5a3a172e6fe84aec0f4aee052ef0045f4c10df8"
+    }
+  ],
+  "hash_scope": "Current complete application source/UI/guide, README, primary guide, project metadata, independent numeric regression and executed Node test/helper sources. Docker/dependency infrastructure is owned and validated separately by root; its accepted complete backend runtime proof hash is recorded in runtime_http.",
+  "commands": [
+    "work/.venv/bin/python -m pytest -q (repository cwd)",
+    "node --test tools/test_*.mjs",
+    "work/.venv/bin/python -m bandit -r app -ll",
+    "work/.venv/bin/python work/improvements-0.4/science_independent_http.py (workspace cwd; actual local containers)"
+  ],
+  "frontend": "PASS 10 Node runner entries using tools/test_*.mjs. Real application handlers execute in DOM fixture; separate actual browser visual QA remains root-owned.",
+  "bandit": "PASS0 configured findings",
+  "evidence": [
+    "independent-pytest.txt",
+    "independent-node.txt",
+    "independent-bandit.txt",
+    "independent-docker-http.json"
+  ],
+  "runtime_http": {
+    "status": "PASS",
+    "evidence": "independent-docker-http.json",
+    "evidence_sha256": "7b1cdf25e1caff001ea9509650de4f883e93387b407f415c3dd345f5c5863e53",
+    "backend_freshness": {
+      "status": "PASS",
+      "root_proof_path": "outputs/evidence/improvements-0.4/runtime-source.json",
+      "root_proof_sha256": "e5392418dda519a74650eb84e06dd5fca9114b5cfb7b5ed4a8f1b719ba91d3b8",
+      "container": "6d2317102f945582b5a45c2aeba34700a89e59f974495e9528ca6ff1ded71359",
+      "application_files_verified": 12,
+      "method": "Every current app file hash and complete file set equals accepted root proof of the running container.",
+      "runtime_config_evidence": "docker-runtime.json",
+      "runtime_config_sha256": "608259b9b313c7107ec7064ddba934d23060abceb6cf28b9a780c7af8f3450a4",
+      "image_id": "sha256:58015c002848a825f3ff711f255a67aabd01ba6dc1bc6bdc5358e463d248af6f",
+      "native_health_status": "healthy",
+      "native_health_scope": "Root runtime inspection reports healthy on this exact container/image; independent reviewer checks same current proof and actual HTTP health separately."
+    },
+    "served_assets_verified": 9,
+    "note": "Final recheck against new native-health images: actual health/feature/error HTTP and all served bytes PASS; every existing reviewed source manifest hash unchanged. Complete root backend proof and native-health runtime inspection match exact current container/image IDs."
+  }
+}
