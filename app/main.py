@@ -1,3 +1,4 @@
+from .access import AccessControl
 import math
 from .guard import InputGuard
 import numpy as np
@@ -31,9 +32,16 @@ class Request(BaseModel):
 
     confounder_names: list[str] | None = Field(default=None, max_length=50)
 
+    include_ipw: bool = False
+    propensity_clip: float = Field(default=0.02, ge=0.001, le=0.2, allow_inf_nan=False)
+
     @model_validator(mode="after")
     def valid(self):
         matrix(self.confounders)
+        if self.include_ipw and (
+            len(self.outcome) > 5000 or len(self.confounders[0]) > 20
+        ):
+            raise ValueError("IPW is bounded to 5000 rows and 20 confounders")
         finite(self.outcome)
         if len(self.outcome) != len(self.treatment) or len(self.outcome) != len(
             self.confounders
@@ -67,8 +75,9 @@ def covariate_balance(confounders, treatment, names):
     diagnostics = []
     for index, name in enumerate(names):
         mean0, mean1 = float(control[:, index].mean()), float(treated[:, index].mean())
-        variance0, variance1 = float(control[:, index].var(ddof=1)), float(
-            treated[:, index].var(ddof=1)
+        variance0, variance1 = (
+            float(control[:, index].var(ddof=1)),
+            float(treated[:, index].var(ddof=1)),
         )
         pooled_sd = math.sqrt(
             ((n0 - 1) * variance0 + (n1 - 1) * variance1) / (n0 + n1 - 2)
@@ -117,6 +126,11 @@ def analyze(req: Request):
     z = np.column_stack(
         [np.ones(len(y)), (c - c.mean(0)) / np.where(c.std(0) > 1e-12, c.std(0), 1)]
     )
+    if req.include_ipw and np.linalg.cond(z) > 1e10:
+        raise ValueError(
+            "IPW propensity design is poorly conditioned; remove redundant columns"
+        )
+    converged = False
     beta = np.zeros(z.shape[1])
     for _ in range(100):
         p = 1 / (1 + np.exp(-np.clip(z @ beta, -30, 30)))
@@ -127,6 +141,7 @@ def analyze(req: Request):
         )
         beta += step
         if np.linalg.norm(step) < 1e-8:
+            converged = True
             break
     p = 1 / (1 + np.exp(-np.clip(z @ beta, -30, 30)))
     fraction = float(np.mean((p < 0.05) | (p > 0.95)))
@@ -135,7 +150,67 @@ def analyze(req: Request):
         if req.confounder_names is not None
         else [f"confounder_{i}" for i in range(c.shape[1])]
     )
+    optional = {}
+    if req.include_ipw:
+        if not converged:
+            raise ValueError(
+                "propensity solver did not converge; no IPW estimate reported"
+            )
+        clipped = np.clip(p, req.propensity_clip, 1 - req.propensity_clip)
+        weights = np.where(t == 1, 1 / clipped, 1 / (1 - clipped))
+        means = [
+            float(np.average(y[t == group], weights=weights[t == group]))
+            for group in [0, 1]
+        ]
+        raw = covariate_balance(c, t, names)
+        weighted = []
+        for i, item in enumerate(raw):
+            m0 = float(np.average(c[t == 0, i], weights=weights[t == 0]))
+            m1 = float(np.average(c[t == 1, i], weights=weights[t == 1]))
+            sd = item["pooled_sample_sd"]
+            weighted.append(
+                {
+                    "confounder": names[i],
+                    "control_weighted_mean": m0,
+                    "treated_weighted_mean": m1,
+                    "raw_smd": item["standardized_mean_difference"],
+                    "weighted_smd": (
+                        (m1 - m0) / sd if sd > 0 else (0.0 if m1 == m0 else None)
+                    ),
+                }
+            )
+        count = int(np.sum(p != clipped))
+        optional["ipw"] = {
+            "estimator": "Hajek normalized inverse-probability weighted ATE",
+            "ate": means[1] - means[0],
+            "control_weighted_outcome": means[0],
+            "treated_weighted_outcome": means[1],
+            "group_counts": {
+                "control": int(np.sum(t == 0)),
+                "treated": int(np.sum(t == 1)),
+            },
+            "effective_sample_size": {
+                label: float(
+                    weights[t == group].sum() ** 2 / np.sum(weights[t == group] ** 2)
+                )
+                for group, label in [(0, "control"), (1, "treated")]
+            },
+            "propensity_clip": req.propensity_clip,
+            "clipped_observations": count,
+            "clipped_fraction": count / len(t),
+            "weighted_balance": weighted,
+            "confidence_interval": None,
+            "warnings": (
+                [
+                    "Propensities clipped: clipping changes weights and can introduce bias."
+                ]
+                if count
+                else []
+            ),
+            "limitations": "Uses the existing regularized logistic propensity model fitted on observed confounders. Weighted SMD uses raw pooled sample SD as a fixed descriptive denominator. No cross-fitting, doubly robust correction or uncertainty interval. Requires consistency, positivity and no unmeasured confounding; fitted balance/ESS do not prove identification.",
+        }
     return {
+        **optional,
         "group_counts": {
             "control": int(np.sum(t == 0)),
             "treated": int(np.sum(t == 1)),
@@ -159,7 +234,7 @@ def analyze(req: Request):
     }
 
 
-app = FastAPI(title="CausalLab", version="0.3.0")
+app = FastAPI(title="CausalLab", version="0.4.0")
 
 
 STATIC = Path(__file__).parent / "static"
@@ -205,3 +280,6 @@ def run_analysis(req: Request):
 
 
 app.add_middleware(InputGuard)
+
+
+app.add_middleware(AccessControl)

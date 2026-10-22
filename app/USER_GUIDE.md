@@ -1,4 +1,4 @@
-# CausalLab user guide — v0.3.0
+# CausalLab user guide — v0.4.0
 
 ## What this tool does
 
@@ -52,7 +52,7 @@ Input requirements: At least ten total rows and three rows in each treatment gro
 
 ## Methods
 
-OLS fits outcome = intercept + treatment coefficient × binary treatment + confounder coefficients. HC1 heteroskedasticity-robust covariance supplies a normal-approximation interval. A regularized logistic fit on standardized confounders diagnoses empirical extreme propensities (below0.05 or above0.95); it does not estimate a second effect or establish positivity.
+OLS fits outcome = intercept + treatment coefficient × binary treatment + confounder coefficients. HC1 heteroskedasticity-robust covariance supplies a normal-approximation interval. By default, a regularized logistic fit on standardized confounders supplies overlap diagnostics only, flagging empirical extreme propensities (below 0.05 or above 0.95); this default path does not estimate a second effect or establish positivity. When optional IPW is enabled, those fitted propensities also produce the separate clipped Hájek ATE estimate described below. Neither use establishes population positivity or controls unmeasured confounding.
 
 ## Read the output
 
@@ -92,14 +92,24 @@ pip-audit --strict
 bandit -r app -ll
 ```
 
-Python tests exercise numerical results and actual HTTP endpoints. Node tests exercise CSV parsing, column mapping, numeric rejection and the synthetic analysis payload. Node22+ is used for development checks; it is not a runtime service dependency. Fresh v0.3.0 developer evidence is under `evidence/improvements-0.3/`; it records what was run and does not establish unexecuted Docker, GitHub CI or human validation. Configure required CI checks and never merge a failing release.
+Python tests exercise numerical results and actual HTTP endpoints. Node tests exercise CSV parsing, column mapping, numeric rejection and the synthetic analysis payload. Node22+ is used for development checks; it is not a runtime service dependency. Fresh v0.4.0 developer evidence is under `evidence/improvements-0.4/`; it records what was run and does not establish unexecuted Docker, GitHub CI or human validation. Configure required CI checks and never merge a failing release.
 
 MIT license; see LICENSE.
 
-## v0.3.0: descriptive covariate balance
+## v0.4.0: descriptive covariate balance
 
 The UI now reports raw treated/control counts and a balance table for every selected confounder. CSV column labels are sent as optional `confounder_names`; API clients can omit names for backward-compatible `confounder_0`, etc. Supplied names must match matrix width, be nonempty and unique after trimming, and each contain at most100 characters.
 
 `covariate_balance` contains control/treated means, pooled sample SD, signed treated-minus-control SMD, absolute SMD, a descriptive flag, and a zero-variance indicator. For group sizes n0/n1 and **sample** variances s0²/s1², pooled SD = sqrt(((n0−1)s0²+(n1−1)s1²)/(n0+n1−2)). SMD = (treated mean−control mean)/pooled SD. Example: groups[1,2,3,4,5] and[2,3,4,5,6] have means3/4, pooled SDsqrt(2.5) and SMD≈0.63246.
 
 The |SMD|≥0.1 flag is a descriptive heuristic, not a test, p-value, causal criterion or evidence that an intervention should proceed. Diagnostics describe **raw unweighted groups before adjustment**; OLS does not make these groups balanced. A low SMD cannot prove no hidden confounding, positivity, or correct functional form. Zero pooled variance with unequal means yields null SMD and a flag; identical constant groups yield SMD0. The existing full-rank outcome-model requirement still rejects constant/collinear input designs. HC1 standard errors and normal-approximation intervals are unchanged. Exported reports include group counts and the full balance table.
+
+## v0.4.0: optional Hájek IPW comparison
+
+Check **Also estimate Hájek IPW ATE** and choose a clipping bound; or add `include_ipw:true` and `propensity_clip:0.02` to `/analyze`. Default false preserves the OLS-only response. Existing OLS coefficients, HC1 standard errors and normal intervals remain. The added `ipw` result is a separate estimator with **no confidence interval**.
+
+The existing L2-regularized logistic propensity model is fitted to standardized measured confounders. A checked-convergence, adequately conditioned fit is required. Probabilities are clipped to[clip,1−clip], clip0.001–0.2. Treated weights are1/p; control weights are1/(1−p). Each arm's weighted outcome mean is normalized by that arm's sum of weights; their difference is the Hájek ATE. ESS per group is(sum w)²/sum(w²). Outputs include clipping count/fraction and a warning whenever clipping occurred. Clipping can reduce extreme weights but introduce bias; estimates need not agree with OLS.
+
+Weighted covariate means are compared using the **same raw pooled sample SD** as the raw SMD, allowing a descriptive before/after weighting comparison. Balance/ESS do not establish causal identification. IPW requires correct propensity specification, positivity, consistency and no unmeasured confounding. No cross-fitting, doubly robust estimation, longitudinal exposure model or uncertainty quantification is provided. At most5,000 rows/20 confounders are permitted for IPW; the same full-rank OLS input requirements still apply because both estimates are returned. Nonconverged/poorly conditioned propensity fits are rejected rather than reported as certain estimates.
+
+Synthetic complete request: `examples/synthetic-ipw.json`. Background: [Cole and Hernán2008, inverse-probability weight construction](https://pubmed.ncbi.nlm.nih.gov/18682488/); this tool implements a bounded single-time binary-treatment Hájek estimator, not every method discussed in that paper.

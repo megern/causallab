@@ -127,7 +127,6 @@ test("synthetic CSV produces actual API request", () => {
     );
   }
 });
-console.log(`${checks} frontend checks passed for ${cfg.title}`);
 
 const causalChart = require("../app/static/causal-chart.js");
 test("causal interval spans outcome units and includes zero reference", () => {
@@ -232,4 +231,38 @@ test("selected confounder labels preserved in replay payload", () => {
   assert.equal(request.confounders[7][0], 2);
 });
 
-console.log(`${checks} final frontend checks passed for ${cfg.title} v0.3.0`);
+test("new scientific option is wired through the actual parameter collector", () => {
+  const source = fs.readFileSync(
+    new URL("../app/static/workbench.js", import.meta.url),
+    "utf8",
+  );
+  const collector = source.slice(
+    source.indexOf("function parameters()"),
+    source.indexOf("function mapping()"),
+  );
+  const fields = Object.fromEntries(
+    cfg.params.map(([name, , value]) => [
+      "param-" + name,
+      {
+        value: String(value),
+        checkValidity: () => true,
+        labels: [{ textContent: name }],
+      },
+    ]),
+  );
+  fields["include-ipw"] = { checked: true };
+  fields["param-model"] = { value: "random_forest" };
+  const settings = vm.runInNewContext(collector + ";parameters()", {
+    cfg,
+    $: (id) => fields[id],
+  });
+  if (cfg.slug === "causallab") {
+    assert.equal(settings.include_ipw, true);
+    assert.equal(settings.propensity_clip, 0.02);
+  } else {
+    assert.equal(settings.model, "random_forest");
+    assert.equal(settings.trees, 50);
+  }
+});
+
+console.log(`${checks} frontend checks passed for ${cfg.title} v0.4.0`);

@@ -112,6 +112,7 @@ function parameters() {
     values[key] = Number(input.value);
   });
   if (cfg.method) values.method = $("param-method").value;
+  values.include_ipw = $("include-ipw").checked;
   return values;
 }
 function mapping() {
@@ -255,12 +256,12 @@ function render(result, input) {
   }
   if (cfg.slug === "causallab") {
     metrics([
-      ["Adjusted treatment coefficient", format(result.treatment_effect)],
+      ["OLS treatment coefficient", format(result.treatment_effect)],
       ["HC1 standard error", format(result.robust_standard_error)],
       ["Poor overlap observations", percent(result.poor_overlap_fraction)],
     ]);
     $("chart-title").textContent =
-      "Adjusted coefficient with approximate 95% interval";
+      "OLS coefficient with approximate 95% interval";
     LabCausalChart.draw(
       $("chart"),
       result.treatment_effect,
@@ -289,6 +290,31 @@ function render(result, input) {
       ]),
     );
     $("balance-note").textContent = result.balance_method;
+    $("ipw-results").replaceChildren();
+    if (result.ipw) {
+      const ipw = result.ipw;
+      $("ipw-results").append(
+        element("h3", "Hájek IPW estimate (no uncertainty interval)"),
+        element(
+          "p",
+          `ATE ${format(ipw.ate)}; control ESS ${format(ipw.effective_sample_size.control)}, treated ESS ${format(ipw.effective_sample_size.treated)}; clipped ${ipw.clipped_observations} observations (${percent(ipw.clipped_fraction)}).`,
+        ),
+      );
+      const weightedBalance = element("div");
+      table(
+        weightedBalance,
+        ["Confounder", "Raw SMD", "Weighted SMD (raw SD denominator)"],
+        ipw.weighted_balance.map((row) => [
+          row.confounder,
+          format(row.raw_smd),
+          format(row.weighted_smd),
+        ]),
+      );
+      $("ipw-results").append(
+        weightedBalance,
+        element("p", ipw.warnings.join(" ") + " " + ipw.limitations),
+      );
+    }
     headers = ["Diagnostic", "Value"];
     rows = [
       [
@@ -464,7 +490,7 @@ $("export-result").onclick = () => {
   if (lastResult)
     download(cfg.slug + "-report.json", {
       application: cfg.title,
-      version: "0.3.0",
+      version: "0.4.0",
       data_source: $("source-label").textContent,
       created_at: new Date().toISOString(),
       configuration: analysisSnapshot,

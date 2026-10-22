@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>CausalLab · Research workbench</title>
     <link rel="stylesheet" href="/static/style.css" />
+    <script src="/static/access.js"></script>
     <script src="/static/config.js" defer></script>
     <script src="/static/data.js" defer></script>
     <script src="/static/causal-chart.js" defer></script>
@@ -12,7 +13,7 @@
   </head>
   <body>
     <header>
-      <span class="badge">Local CPU research · v0.3.0</span>
+      <span class="badge">Local CPU research · v0.4.0</span>
       <h1>CausalLab</h1>
       <p>
         Estimate a treatment coefficient while adjusting for measured
@@ -36,7 +37,29 @@
       <section>
         <h2>2. Map columns and settings</h2>
         <div id="mapping"></div>
-        <div class="fields"></div>
+        <div class="fields">
+          <div>
+            <label for="param-propensity_clip"
+              >IPW probability clipping bound</label
+            ><input
+              type="number"
+              id="param-propensity_clip"
+              value="0.02"
+              min="0.001"
+              max="0.2"
+              step="any"
+              required
+            />
+          </div>
+          <div>
+            <label for="include-ipw">Also estimate Hájek IPW ATE</label
+            ><input type="checkbox" id="include-ipw" />
+            <p class="hint">
+              No IPW confidence interval; clipping and weighted balance require
+              review.
+            </p>
+          </div>
+        </div>
         <p class="hint">
           Requires at least three observations in each treatment group. A
           coefficient is causal only under the stated identification
@@ -57,6 +80,7 @@
         <p id="group-counts"></p>
         <div class="scroll" id="balance-table"></div>
         <p id="balance-note" class="hint"></p>
+        <div id="ipw-results"></div>
         <h3>Assumptions and limits</h3>
         <p id="assumptions" class="hint"></p>
         <button id="export-result" disabled>Export result report (JSON)</button

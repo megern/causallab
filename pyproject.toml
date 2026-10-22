@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "causallab"
-version = "0.3.0"
+version = "0.4.0"
 description = "Confounder-adjusted OLS treatment-effect estimation with overlap diagnostics."
 requires-python = ">=3.12"
 license = "MIT"
